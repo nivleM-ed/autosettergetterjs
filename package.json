@@ -35,5 +35,9 @@
 		"typescript": "^3.6.4",
 		"vscode-test": "^1.2.2"
 	},
-	"publisher": "nivleM"
+	"publisher": "nivleM",
+	"repository": {
+        "type": "git",
+        "url": "https://github.com/nivleM-ed/autosettergetterjs"
+    }
 }
