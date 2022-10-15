@@ -20,7 +20,9 @@ function activate(context) {
 
 		const start = () => {
 			return vscode.commands.executeCommand('editor.action.formatSelection').then(run => {
-				var text = editor.document.getText(editor.selection).replace(/(\r\n|\n|\r|{|})/gm, "").split(';');
+				var text = editor.document.getText(editor.selection).replace(/(\r\n|\n|\r|{|})/gm, "").split(';').filter(function (el) {
+					return el.trim() != '';
+				});
 
 				if (text.length - 1 < 1) vscode.window.showInformationMessage('No data selected');
 				else vscode.window.showInformationMessage('Running JS setter getter');
