@@ -1,4 +1,7 @@
 const vscode = require('vscode');
+const {
+	reservedWords
+} = require('./reservedWords');
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -22,30 +25,45 @@ function activate(context) {
 				if (text.length - 1 < 1) vscode.window.showInformationMessage('No data selected');
 				else vscode.window.showInformationMessage('Running JS setter getter');
 
-				for (var i = 0; i < text.length - 1; i++) {
-					var tmp = text[i].split(" ").filter(function (el) {
-						return el;
+				var editData = [];
+				text = [...new Set(text)];
+				text.forEach(item => {
+					var tmp = item.split(" ").filter(function (el) {
+						return !(el.trim() == '' || el.trim() == '=' || reservedWords.includes(el.trim()));
 					});
 
-					text[i] =
-					`
-					get ${tmp[1]}() {
-					\treturn this._${tmp[1]};
+					var variable = tmp[0];
+					var innerVar = formatVariable(variable, 'inner');
+					var functionVar = formatVariable(variable, 'function');
+					var setterGetter =
+						`
+					get ${functionVar}() {
+					\treturn this.${innerVar};
 					}
-					set ${tmp[1]}(in_${tmp[1]}) {
-					\tthis._${tmp[1]} = in_${tmp[1]};
+					set ${functionVar}(in${innerVar}) {
+					\tthis.${innerVar} = in${innerVar};
 					}
-					`
-				}
+					`;
+					editData.push(setterGetter);
+				});
 
 				editor.edit((edit) => {
-					for (var i = 0; i < text.length - 1; i++) {
-						edit.insert(editor.selection.end, text[i]);
-					}
+					editData.forEach(data => {
+						edit.insert(editor.selection.end, data);
+					});
 				});
 			}).then(end => {
 				vscode.commands.executeCommand('editor.action.formatSelection');
 			})
+		}
+
+		const formatVariable = ( /** @type {string} */ variable, /** @type {string} */ type) => {
+			switch (type) {
+				case 'inner':
+					return '_' + variable.replace(/this.|_/g, '');
+				case 'function':
+					return variable.replace(/this.|_/g, '');
+			}
 		}
 
 		start();
@@ -56,9 +74,6 @@ function activate(context) {
 
 	context.subscriptions.push(disposable);
 }
-
-exports.activate = activate;
-
 
 function deactivate() {
 	console.log("Thanks for using my extension. Hope to see you again");
