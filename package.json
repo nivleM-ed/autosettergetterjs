@@ -2,7 +2,7 @@
 	"name": "autosettergetterjs",
 	"displayName": "Auto Setter&Getter for JS",
 	"description": "Automatically sets setter and getter for javascript",
-	"version": "0.0.2",
+	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
